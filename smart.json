@@ -4,7 +4,7 @@
     "homepage": "https://github.com/aldeed/meteor-collection2",
     "author": "Eric Dobbertin (http://dairystatedesigns.com)",
     "version": "0.1.4",
-    "git": "https://github.com/aldeed/meteor-collection2.git",
+    "git": "https://github.com/sterlingwes/meteor-collection2.git",
     "packages": {
         "simple-schema": {}
     }
