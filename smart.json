@@ -6,6 +6,8 @@
     "version": "0.1.4",
     "git": "https://github.com/sterlingwes/meteor-collection2.git",
     "packages": {
-        "simple-schema": {}
+        "simple-schema": {
+			"git": "https://github.com/sterlingwes/meteor-simple-schema.git"
+		}
     }
 }
