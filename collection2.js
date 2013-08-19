@@ -12,6 +12,13 @@ Meteor.Collection2 = function(name, options) {
     if ("schema" in options) {
         delete options.schema;
     }
+	
+	// add hooks
+	self._beforeInsert = options.beforeInsert;
+	self._beforeUpdate = options.beforeUpdate;
+	self._afterInsert = options.afterInsert;
+	self._afterUpdate = options.afterUpdate;
+	options = _.omit(options, 'beforeInsert', 'beforeUpdate', 'afterInsert', 'afterUpdate');
 
     //get the virtual fields
     self._virtualFields = options.virtualFields;
@@ -77,11 +84,21 @@ _.extend(Meteor.Collection2.prototype, {
         }
 
         if (type === "insert") {
+			if(typeof self._beforeInsert === "function" && args[0]) {
+				var newArgs = self._beforeInsert(args[0],schema._schema);
+				if(typeof newArgs === "object")
+					args[0] = newArgs;
+			}
             doc = args[0];
         } else if (type === "update") {
             //for updates, we handle validating $set and $unset; otherwise, just
             //pass through to the real collection
             if (args[1] && (args[1].$set || args[1].$unset)) {
+				if(typeof self._beforeUpdate === "function" && args[1]) {
+					var newArgs = self._beforeUpdate(args[1],schema._schema);
+					if(typeof newArgs === "object")
+						args[1] = newArgs;
+				}
                 doc = args[1];
             } else {
                 return collection.update.apply(collection, args);
@@ -105,7 +122,13 @@ _.extend(Meteor.Collection2.prototype, {
                     Meteor._debug(type + " failed: " + (err.reason || err.stack));
             };
         }
-
+		
+		//check if we can handle any schema directives (datenow)
+		_.each(schema._schema, function(val,key) {
+			if(val.datenow && !doc[key])
+				doc[key] = new Date();
+		});
+		
         //clean up doc
         doc = schema.filter(doc);
         doc = schema.autoTypeConvert(doc);
@@ -115,13 +138,22 @@ _.extend(Meteor.Collection2.prototype, {
         if (schema.valid()) {
             if (type === "insert") {
                 args[0] = doc; //update to reflect whitelist and typeconvert changes
-                return collection.insert.apply(collection, args);
+                var res = collection.insert.apply(collection, args);
+				if(typeof self._afterInsert === "function") {
+					self._afterInsert(res,doc);
+				}
+				return res;
             } else {
                 args[1] = doc; //update to reflect whitelist and typeconvert changes
-                return collection.update.apply(collection, args);
+                var res = collection.update.apply(collection, args);
+				if(typeof self._afterUpdate === "function") {
+					self._afterUpdate(res,doc);
+				}
+				return res;
             }
         } else {
-            error = new Error("failed validation");
+            error = new Error("Failed validation");
+			error.invalid = schema.invalidKeys();
             if (callback) {
                 callback(error);
                 return null;
