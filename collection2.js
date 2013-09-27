@@ -93,7 +93,7 @@ _.extend(Meteor.Collection2.prototype, {
         } else if (type === "update") {
             //for updates, we handle validating $set and $unset; otherwise, just
             //pass through to the real collection
-            if (args[1] && (args[1].$set || args[1].$unset)) {
+            if (args[1] && (args[1].$set)) {
 				if(typeof self._beforeUpdate === "function" && args[1]) {
 					var newArgs = self._beforeUpdate(args[1],schema._schema);
 					if(typeof newArgs === "object")
