@@ -124,10 +124,12 @@ _.extend(Meteor.Collection2.prototype, {
         }
 		
 		//check if we can handle any schema directives (datenow)
-		_.each(schema._schema, function(val,key) {
-			if(val.datenow && !doc[key])
-				doc[key] = new Date();
-		});
+		if(type == "insert") {
+			_.each(schema._schema, function(val,key) {
+				if(val.datenow && !doc[key])
+					doc[key] = new Date();
+			});
+		}
 		
         //clean up doc
         doc = schema.filter(doc);
