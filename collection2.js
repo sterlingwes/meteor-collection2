@@ -95,7 +95,7 @@ _.extend(Meteor.Collection2.prototype, {
             //pass through to the real collection
             if (args[1] && (args[1].$set)) {
 				if(typeof self._beforeUpdate === "function" && args[1]) {
-					var newArgs = self._beforeUpdate(args[1],schema._schema);
+					var newArgs = self._beforeUpdate(args[1],schema._schema,args[0]);
 					if(typeof newArgs === "object")
 						args[1] = newArgs;
 				}
