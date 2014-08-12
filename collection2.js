@@ -94,11 +94,11 @@ _.extend(Meteor.Collection2.prototype, {
             //for updates, we handle validating $set and $unset; otherwise, just
             //pass through to the real collection
             if (args[1] && (args[1].$set)) {
-				if(typeof self._beforeUpdate === "function" && args[1]) {
-					var newArgs = self._beforeUpdate(args[1],schema._schema,args[0]);
-					if(typeof newArgs === "object")
-						args[1] = newArgs;
-				}
+        				if(typeof self._beforeUpdate === "function" && args[1]) {
+        					var newArgs = self._beforeUpdate(args[1],schema._schema,args[0]);
+        					if(typeof newArgs === "object")
+        						args[1] = newArgs;
+        				}
                 doc = args[1];
             } else {
                 return collection.update.apply(collection, args);
@@ -123,14 +123,14 @@ _.extend(Meteor.Collection2.prototype, {
             };
         }
 		
-		//check if we can handle any schema directives (datenow)
-		if(type == "insert") {
-			_.each(schema._schema, function(val,key) {
-				if(val.datenow && !doc[key])
-					doc[key] = new Date();
-			});
-		}
-		
+    		//check if we can handle any schema directives (datenow)
+    		if(type == "insert") {
+    			_.each(schema._schema, function(val,key) {
+    				if(val.datenow && !doc[key])
+    					doc[key] = new Date();
+    			});
+    		}
+    		
         //clean up doc
         doc = schema.filter(doc);
         doc = schema.autoTypeConvert(doc);
